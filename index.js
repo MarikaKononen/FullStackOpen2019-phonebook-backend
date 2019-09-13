@@ -25,12 +25,23 @@ let persons = [
         "id": 4
       }
 ]  
-// SHOW all persons
+// ROUTE for SHOW all persons
 app.get('/api/persons', (req, res) => {
     res.json(persons)
 })
 
-// SHOW info
+//ROUTE for SHOW one person
+app.get('/persons/:id', (req, res) =>{
+    const id = Number(req.params.id)
+    const person = persons.find(person => person.id === id)
+    if (person){
+        res.json(person)
+    } else {
+        res.status(404).end()
+    }
+}) 
+
+// ROUTE for SHOW info
 app.get('/info', (req, res) => {
     let numberOfPersons = persons.length;
     let today = new Date()

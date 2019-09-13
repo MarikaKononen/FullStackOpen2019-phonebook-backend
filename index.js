@@ -25,9 +25,20 @@ let persons = [
         "id": 4
       }
 ]  
-
+// SHOW all persons
 app.get('/api/persons', (req, res) => {
     res.json(persons)
+})
+
+// SHOW info
+app.get('/info', (req, res) => {
+    let numberOfPersons = persons.length;
+    let today = new Date()
+    let firstLine1 = 'Phonbook has info for '
+    let firstLine2 = ' people'
+    let firstLine = firstLine1 + numberOfPersons + firstLine2
+
+    res.send(`<p>${firstLine}</p><p>${today}</p>`)
 })
 
 const PORT = 3001

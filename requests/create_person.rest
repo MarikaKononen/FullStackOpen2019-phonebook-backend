@@ -1,0 +1,7 @@
+post http://localhost:3001/persons
+content-type: application/json
+
+{
+    "name": "Pala Könönen",
+    "number": "456678899123"
+}

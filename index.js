@@ -52,6 +52,13 @@ app.get('/info', (req, res) => {
     res.send(`<p>${firstLine}</p><p>${today}</p>`)
 })
 
+// DELETE ROUTE
+app.delete('/persons/:id', (req, res) => {
+    const id = Number(req.params.id)
+    person = persons.filter(person => person.id !== id)
+    res.status(204).end()
+})
+
 const PORT = 3001
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)

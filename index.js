@@ -2,6 +2,7 @@ const express    = require('express')
 const app        = express()
 const bodyParser = require('body-parser')
 
+app.use(bodyParser.json())
 
 let persons = [
       {
@@ -25,6 +26,14 @@ let persons = [
         "id": 4
       }
 ]  
+
+const generateId = () => {
+    const maxId = persons.length > 0
+      ? Math.max(...persons.map(n => n.id))
+      : 0
+    return maxId + 1
+  }
+
 // ROUTE for SHOW all persons
 app.get('/api/persons', (req, res) => {
     res.json(persons)
@@ -50,6 +59,34 @@ app.get('/info', (req, res) => {
     let firstLine = firstLine1 + numberOfPersons + firstLine2
 
     res.send(`<p>${firstLine}</p><p>${today}</p>`)
+})
+
+// CREATE ROUTE
+app.post('/api/persons', (req, res) => {
+    const body = req.body
+    console.log('body', body)
+
+    if (!body.name){
+        return res.status(400).json({
+            error: 'name missing'
+        })
+    }
+    
+    if ( !body.number){
+        return res.status(400).json({
+            error: 'number missing'
+        })
+    }
+
+    const person = {
+        name: body.name,
+        number: body.number,
+        id: generateId()
+    }
+    console.log(person)
+    persons = persons.concat(person)
+    res.json(person)
+
 })
 
 // DELETE ROUTE

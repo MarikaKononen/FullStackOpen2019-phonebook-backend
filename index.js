@@ -4,7 +4,7 @@ const bodyParser = require('body-parser')
 const morgan     = require('morgan')
 
 app.use(bodyParser.json())
-app.use(morgan('tiny'))
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :person'))
 
 
 let persons = [
@@ -37,6 +37,9 @@ const generateId = () => {
     return maxId + 1
 }
 
+morgan.token('person', function (req, res) { 
+    return JSON.stringify(req.body) 
+})
 
 
 // ROUTE for SHOW all persons

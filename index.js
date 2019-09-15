@@ -1,8 +1,11 @@
 const express    = require('express')
 const app        = express()
 const bodyParser = require('body-parser')
+const morgan     = require('morgan')
 
 app.use(bodyParser.json())
+app.use(morgan('tiny'))
+
 
 let persons = [
       {
@@ -32,7 +35,9 @@ const generateId = () => {
       ? Math.max(...persons.map(n => n.id))
       : 0
     return maxId + 1
-  }
+}
+
+
 
 // ROUTE for SHOW all persons
 app.get('/api/persons', (req, res) => {
@@ -102,6 +107,13 @@ app.delete('/persons/:id', (req, res) => {
     person = persons.filter(person => person.id !== id)
     res.status(204).end()
 })
+
+const unknownEndpoint = (req, res) => {
+    console.log('unknownEndpoint')
+    res.status(404).send({error: 'unknown endpoint'})
+}
+
+app.use(unknownEndpoint)
 
 const PORT = 3001
 app.listen(PORT, () => {

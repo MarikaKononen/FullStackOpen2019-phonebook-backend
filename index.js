@@ -2,10 +2,11 @@ const express    = require('express')
 const app        = express()
 const bodyParser = require('body-parser')
 const morgan     = require('morgan')
+const cors       = require('cors')
 
 app.use(bodyParser.json())
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :person'))
-
+app.use(cors())
 
 let persons = [
       {
@@ -41,14 +42,13 @@ morgan.token('person', function (req, res) {
     return JSON.stringify(req.body) 
 })
 
-
 // ROUTE for SHOW all persons
 app.get('/api/persons', (req, res) => {
     res.json(persons)
 })
 
 //ROUTE for SHOW one person
-app.get('/persons/:id', (req, res) =>{
+app.get('/api/persons/:id', (req, res) =>{
     const id = Number(req.params.id)
     const person = persons.find(person => person.id === id)
     if (person){
@@ -105,7 +105,7 @@ app.post('/api/persons', (req, res) => {
 })
 
 // DELETE ROUTE
-app.delete('/persons/:id', (req, res) => {
+app.delete('/api/persons/:id', (req, res) => {
     const id = Number(req.params.id)
     person = persons.filter(person => person.id !== id)
     res.status(204).end()
@@ -118,7 +118,7 @@ const unknownEndpoint = (req, res) => {
 
 app.use(unknownEndpoint)
 
-const PORT = 3001
+const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 })

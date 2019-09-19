@@ -1,8 +1,10 @@
 const express    = require('express')
+const mongoose   = require('mongoose')
 const app        = express()
 const bodyParser = require('body-parser')
 const morgan     = require('morgan')
 const cors       = require('cors')
+const password   = process.argv[2]
 
 app.use(bodyParser.json())
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :person'))

@@ -1,15 +1,18 @@
+require('dotenv').config()
 const express    = require('express')
-const mongoose   = require('mongoose')
 const app        = express()
 const bodyParser = require('body-parser')
 const morgan     = require('morgan')
 const cors       = require('cors')
-const password   = process.argv[2]
+const Person = require('./models/person')
 
+// app config
 app.use(bodyParser.json())
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :person'))
 app.use(cors())
 app.use(express.static('build'))
+
+
 
 let persons = [
       {
@@ -47,18 +50,16 @@ morgan.token('person', function (req, res) {
 
 // ROUTE for SHOW all persons
 app.get('/api/persons', (req, res) => {
-    res.json(persons)
+    Person.find({}).then(persons => {
+        res.json(persons.map(person => person.toJSON()))
+    })
 })
 
 //ROUTE for SHOW one person
-app.get('/api/persons/:id', (req, res) =>{
-    const id = Number(req.params.id)
-    const person = persons.find(person => person.id === id)
-    if (person){
-        res.json(person)
-    } else {
-        res.status(404).end()
-    }
+app.get('/api/persons/:id', (req, res) => {
+   Person.findById(req.params.id).then(person =>{
+       res.json(person.toJSON())
+   })
 }) 
 
 // ROUTE for SHOW info
@@ -77,33 +78,26 @@ app.post('/api/persons', (req, res) => {
     const body = req.body
     console.log('body', body)
     
-
-    if (!body.name){
-        return res.status(400).json({
-            error: 'name missing'
-        })
+    if (body.name === undefined){
+        return res.status(400).json({error: 'name missing'})
     }
     
     if (persons.find(p => p.name === body.name)){
-        return res.status(400).json({
-            error: 'name must be unique'
-        })
+        return res.status(400).json({error: 'name must be unique'})
     }
     
-    if ( !body.number){
-        return res.status(400).json({
-            error: 'number missing'
-        })
+    if ( body.number === undefined){
+        return res.status(400).json({error: 'number missing'})
     }
 
-    const person = {
+    const person = new Person({
         name: body.name,
-        number: body.number,
-        id: generateId()
-    }
-    console.log(person)
-    persons = persons.concat(person)
-    res.json(person)
+        number: body.number || false
+    })
+
+    person.save().then(savedPerson =>{
+        res.json(savedPerson.toJSON())
+    })
 
 })
 
@@ -121,7 +115,7 @@ const unknownEndpoint = (req, res) => {
 
 app.use(unknownEndpoint)
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 })

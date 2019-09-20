@@ -8,5 +8,5 @@ MERN app - phonebook with Node.js & Express backend
 3c MongoDB - exercises      
 3d Validation ESLint - exercises   
 
-Backend of the phonebook can be found in Heroku:  
+The phonebook can be found from Heroku:  
 https://shielded-mesa-47426.herokuapp.com

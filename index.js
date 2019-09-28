@@ -50,19 +50,6 @@ morgan.token('person', function (req, res) {
 async function checkIfUserExists(user) {
     const doesUserExists = await Person.exists({ name: user })
     return doesUserExists
-    // Person.find({name : user})
-    //     .then(foundedPerson => {
-    //         if (foundedPerson.length){
-    //             console.log(`user name ${foundedPerson} exists`)
-    //             return true
-    //         }else{
-    //             console.log('User is not in db')
-    //             return false
-    //         }
-    //     })
-    //     .catch(error => {
-    //         console.log('in checkIfUserExists,error is: ', error)
-    //     })      
 }
 
 // ROUTE for SHOW all persons
@@ -110,8 +97,6 @@ app.post('/api/persons', (req, res) => {
     if (body.name === undefined){
         return res.status(400).json({error: 'name missing'})
     }
-
-   
     console.log('doesUserExists ', checkIfUserExists(body.name))
 
     if (checkIfUserExists(body.name) === true){
@@ -177,7 +162,7 @@ const errorHandler = (error, req, res, next) => {
     if (error.name === 'CastError' && error.kind == 'ObjectId'){
         return res.status(400).send({error: 'malformatted id'})
     }
-    if (error.name === 'TypeError'){
+    if (error.name === 'TypeError' && error.kind == 'toJSON'){
         return res.status(404).send({error: 'cannot find anything from DB with that id'})
     }
     next(error)

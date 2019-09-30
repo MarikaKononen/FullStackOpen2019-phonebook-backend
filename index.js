@@ -12,45 +12,10 @@ app.use(bodyParser.json())
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :person'))
 app.use(cors())
 
-
-/* let persons = [
-      {
-        "name": "Arto Hellas",
-        "number": "040-123456",
-        "id": 1
-      },
-      {
-        "name": "Ada Lovelace",
-        "number": "39-44-5323523",
-        "id": 2
-      },
-      {
-        "name": "Dan Abramov",
-        "number": "12-43-234345",
-        "id": 3
-      },
-      {
-        "name": "Mary Poppendieck",
-        "number": "39-23-6423122",
-        "id": 4
-      }
-]   */
-
-/* const generateId = () => {
-    const maxId = persons.length > 0
-      ? Math.max(...persons.map(n => n.id))
-      : 0
-    return maxId + 1
-} */
-
 morgan.token('person', function (req, res) { 
     return JSON.stringify(req.body) 
 })
 
-async function checkIfUserExists(user) {
-    const doesUserExists = await Person.exists({ name: user })
-    return doesUserExists
-}
 
 // ROUTE for SHOW all persons
 app.get('/api/persons', (req, res) => {
@@ -90,32 +55,22 @@ app.get('/info', (req, res) => {
 })
 
 // CREATE ROUTE
-app.post('/api/persons', (req, res) => {
+app.post('/api/persons', (req, res, next) => {
     const body = req.body
     console.log('body', body)
 
-    if (body.name === undefined){
-        return res.status(400).json({error: 'name missing'})
-    }
-    console.log('doesUserExists ', checkIfUserExists(body.name))
-
-    if (checkIfUserExists(body.name) === true){
-        return res.status(400).json({error: 'name must be unique'})
-    }
-
-    if ( body.number === undefined){
-        return res.status(400).json({error: 'number missing'})
-    }
-
     const person = new Person({
         name: body.name,
-        number: body.number || false
+        number: body.number
     })
 
-    person.save().then(savedPerson =>{
-        res.json(savedPerson.toJSON())
+    person
+    .save()
+    .then(savedPerson => savedPerson.toJSON())
+    .then(savedAndFormattedPerson => {
+     res.json(savedAndFormattedPerson)
     })
-
+    .catch(error => next(error))
 })
 
 // UPDATE ROUTE
@@ -125,16 +80,16 @@ app.put('/api/persons/:id', (req, res, next) =>{
     if ( body.number === ""){
         return res.status(400).json({error: 'number missing'})
     }
-
+    
     const person = {
         name: body.name,
         number: body.number
     }
 
-
     Person.findByIdAndUpdate(req.params.id, person, {new: true})
-     .then(updatedPerson => {
-         res.json(updatedPerson.toJSON())
+     .then(updatedPerson => updatedPerson.toJSON())
+     .then(updatedAndFormattedPerson => {
+         res.json(updatedAndFormattedPerson)
      })
      .catch(error => next(error))
 })
@@ -161,10 +116,11 @@ const errorHandler = (error, req, res, next) => {
 
     if (error.name === 'CastError' && error.kind == 'ObjectId'){
         return res.status(400).send({error: 'malformatted id'})
+
+    } else if(error.name === 'ValidationError'){
+        return res.status(400).json({ error: error.message })
     }
-    if (error.name === 'TypeError' && error.kind == 'toJSON'){
-        return res.status(404).send({error: 'cannot find anything from DB with that id'})
-    }
+
     next(error)
 }
 

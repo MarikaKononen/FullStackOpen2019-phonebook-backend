@@ -1,4 +1,5 @@
 const mongoose   = require('mongoose')
+const uniqueValidator = require('mongoose-unique-validator')
 
 // database config 
 const url = process.env.DBURLPHONEBOOK
@@ -13,9 +14,21 @@ mongoose.connect(url, {useNewUrlParser: true, useUnifiedTopology: true, useFindA
     })
 
 const personSchema = new mongoose.Schema({
-    name: String, 
-    number: String
+    name: {
+        type: String,
+        minlength: 3,
+        unique: true,
+        uniqueCaseInsensitive: true,
+        required: true
+    }, 
+    number: {
+        type: String,
+        minlength: 8,
+        required: true
+    }
 })
+
+
 
 personSchema.set('toJSON', {
     transform: (document, returnedObject) => {
@@ -24,5 +37,7 @@ personSchema.set('toJSON', {
         delete returnedObject.__v
     }
 })
+personSchema.plugin(uniqueValidator,{ message: 'Error, the name exists already in the database, it must be unique.' })
+
 
 module.exports =  mongoose.model('Person', personSchema)

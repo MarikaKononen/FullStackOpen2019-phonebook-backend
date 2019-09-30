@@ -13,15 +13,15 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :p
 app.use(cors())
 
 morgan.token('person', function (req, res) { 
-    return JSON.stringify(req.body) 
+  return JSON.stringify(req.body) 
 })
 
 
 // ROUTE for SHOW all persons
 app.get('/api/persons', (req, res) => {
-    Person.find({}).then(persons => {
-        res.json(persons.map(person => person.toJSON()))
-    })
+  Person.find({}).then(persons => {
+    res.json(persons.map(person => person.toJSON()))
+  })
 })
 
 //ROUTE for SHOW one person

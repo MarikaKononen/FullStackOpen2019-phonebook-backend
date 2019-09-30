@@ -5,7 +5,7 @@ const uniqueValidator = require('mongoose-unique-validator')
 const url = process.env.DBURLPHONEBOOK
 console.log('connecting to ', url)  
 
-mongoose.connect(url, {useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false})
+mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false })
     .then(result => {
         console.log('connected to MongoDB')
     })
@@ -20,7 +20,7 @@ const personSchema = new mongoose.Schema({
         unique: true,
         uniqueCaseInsensitive: true,
         required: true
-    }, 
+    } ,
     number: {
         type: String,
         minlength: 8,
